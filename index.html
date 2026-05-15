@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-Gravity Agent Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            border: 2px solid #3b82f6;
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            background-color: #1e1e1e;
+        }
+        h1 { color: #3b82f6; }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { background-color: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Anti-Gravity Portal</h1>
+        <p>Connecting web client to the Anti-Gravity custom agent framework...</p>
+        <div id="status">Status: Ready to Connect</div>
+        <button onclick="connectAgent()">Trigger Anti-Gravity</button>
+    </div>
+
+    <script>
+        function connectAgent() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = "Status: Connecting to Agent...";
+            statusDiv.style.color = "#eab308";
+            
+            setTimeout(() => {
+                statusDiv.innerHTML = "Status: Connected successfully!";
+                statusDiv.style.color = "#22c55e";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
