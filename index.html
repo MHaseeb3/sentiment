@@ -3,55 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anti-Gravity Agent Portal</title>
+    <title>Sentiment Analyzer</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+            background: linear-gradient(145deg, #0f0f14 0%, #1a1a24 50%, #12121a 100%);
+            color: #e8e8ef;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 560px;
+            background: #1e1e28;
+            border: 1px solid #2d2d3d;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f4f4f8;
+            margin-bottom: 8px;
             text-align: center;
-            padding: 50px;
         }
-        .container {
-            border: 2px solid #3b82f6;
-            padding: 30px;
+
+        .subtitle {
+            text-align: center;
+            color: #8888a0;
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #a0a0b8;
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: #f0f0f5;
+            background: #14141c;
+            border: 2px solid #2d2d3d;
             border-radius: 10px;
-            display: inline-block;
-            background-color: #1e1e1e;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        h1 { color: #3b82f6; }
+
+        textarea::placeholder {
+            color: #5c5c70;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
         button {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
+            width: 100%;
             margin-top: 20px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s;
         }
-        button:hover { background-color: #2563eb; }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #result {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #14141c;
+            border: 2px solid #2d2d3d;
+            color: #8888a0;
+        }
+
+        #result.happy {
+            background: rgba(34, 197, 94, 0.12);
+            border-color: #22c55e;
+            color: #4ade80;
+        }
+
+        #result.unhappy {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: #ef4444;
+            color: #f87171;
+        }
+
+        #result.neutral {
+            background: rgba(234, 179, 8, 0.1);
+            border-color: #eab308;
+            color: #facc15;
+        }
+
+        #result.empty {
+            color: #5c5c70;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Anti-Gravity Portal</h1>
-        <p>Connecting web client to the Anti-Gravity custom agent framework...</p>
-        <div id="status">Status: Ready to Connect</div>
-        <button onclick="connectAgent()">Trigger Anti-Gravity</button>
-    </div>
+    <div class="card">
+        <h1>Sentiment Analyzer (Happy or Not?)</h1>
+        <p class="subtitle">Type a sentence and we'll guess how it sounds.</p>
+
+        <label for="sentence">Your sentence</label>
+        <textarea
+            id="sentence"
+            placeholder="e.g. I had a great day and feel so happy!"
+            rows="4"
+        ></textarea>
+
+        <button type="button" id="analyze-btn">Analyze Sentiment</button>
+
+        <div id="result" class="empty">Results will appear here.</div>
+    </motion.div>
 
     <script>
-        function connectAgent() {
-            const statusDiv = document.getElementById('status');
-            statusDiv.innerHTML = "Status: Connecting to Agent...";
-            statusDiv.style.color = "#eab308";
-            
-            setTimeout(() => {
-                statusDiv.innerHTML = "Status: Connected successfully!";
-                statusDiv.style.color = "#22c55e";
-            }, 2000);
+        const HAPPY_KEYWORDS = [
+            "happy", "good", "great", "awesome", "love", "smile", "glad",
+            "excited", "blessed", "wonderful", "joyful", "amazing"
+        ];
+
+        const UNHAPPY_KEYWORDS = [
+            "sad", "bad", "angry", "upset", "cry", "hate", "hurt", "sorry",
+            "terrible", "depressed", "stressed", "lonely"
+        ];
+
+        function analyzeSentiment(text) {
+            const normalized = text.toLowerCase().trim();
+            if (!normalized) {
+                return { sentiment: "empty", message: "Please enter a sentence first." };
+            }
+
+            const words = normalized.split(/\W+/).filter(Boolean);
+            let happyCount = 0;
+            let unhappyCount = 0;
+
+            for (const word of words) {
+                if (HAPPY_KEYWORDS.includes(word)) happyCount++;
+                if (UNHAPPY_KEYWORDS.includes(word)) unhappyCount++;
+            }
+
+            for (const keyword of HAPPY_KEYWORDS) {
+                if (normalized.includes(keyword) && !words.includes(keyword)) {
+                    happyCount++;
+                }
+            }
+            for (const keyword of UNHAPPY_KEYWORDS) {
+                if (normalized.includes(keyword) && !words.includes(keyword)) {
+                    unhappyCount++;
+                }
+            }
+
+            if (happyCount > unhappyCount) {
+                return {
+                    sentiment: "happy",
+                    message: "😊 The user sounds Happy!"
+                };
+            }
+            if (unhappyCount > happyCount) {
+                return {
+                    sentiment: "unhappy",
+                    message: "😢 The user sounds Unhappy/Sad."
+                };
+            }
+            return {
+                sentiment: "neutral",
+                message: "😐 Neutral or unclear sentiment."
+            };
         }
+
+        const sentenceInput = document.getElementById("sentence");
+        const analyzeBtn = document.getElementById("analyze-btn");
+        const resultDiv = document.getElementById("result");
+
+        function showResult({ sentiment, message }) {
+            resultDiv.className = sentiment === "empty" ? "empty" : sentiment;
+            resultDiv.textContent = message;
+        }
+
+        function runAnalysis() {
+            const result = analyzeSentiment(sentenceInput.value);
+            showResult(result);
+        }
+
+        analyzeBtn.addEventListener("click", runAnalysis);
+
+        sentenceInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                runAnalysis();
+            }
+        });
     </script>
 </body>
 </html>
